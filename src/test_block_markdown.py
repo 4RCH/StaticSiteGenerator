@@ -29,7 +29,7 @@ blocks = [
 class TestBlockMarkdown(unittest.TestCase):
 
     def setUp(self):
-        with open("./static/markdown.md", "r", encoding="UTF-8") as block_list:
+        with open("./tests/markdown.md", "r", encoding="UTF-8") as block_list:
             self.markdown_content = block_list.read()
         
     """Test that markdown content is correctly split into blocks."""

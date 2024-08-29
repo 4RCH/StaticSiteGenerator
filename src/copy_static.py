@@ -1,6 +1,6 @@
 import os
 
-def clean_up_static_folder(address):
+def clean_up_folder(address):
     for root, dirs, files in os.walk(address, topdown=False):
         for file in files:
             file_path = os.path.join(root, file)
@@ -21,15 +21,15 @@ def clean_up_static_folder(address):
     print (f'[!] Deleted all files and empty folders in the folder {address}')
 
 
-def make_backup(address, backup_folder):
-    if not os.path.exists(backup_folder):
-        os.makedirs(backup_folder)
+def make_copy(address, destination):
+    if not os.path.exists(destination):
+        os.makedirs(destination)
 
     contents = get_path_tree(address)
     for addr, folders, files in contents:
         # Create the corresponding folders in the backup directory
         relative_path = os.path.relpath(addr, start=address)
-        backup_path = os.path.join(backup_folder, relative_path)
+        backup_path = os.path.join(destination, relative_path)
         if not os.path.exists(backup_path):
             os.makedirs(backup_path)
 
@@ -39,8 +39,7 @@ def make_backup(address, backup_folder):
             dst_file = os.path.join(backup_path, file)
             copy_file(src_file, dst_file)
     
-    print (f'[i] Backed up the folder to {backup_folder}')
-
+    print (f'[i] Copied folder and content to: {destination}')
 
 def copy_file(src, dst):
     try:
@@ -98,16 +97,14 @@ def print_tree(contents):
         _print_tree(root_address, '')
         
 
-def main():
+def copy_static_to_public():
     public_folder = "./public"
     static_folder = "./static"
-    backup_folder = './static/backups'
+    backup_folder = './backups'
 
-    make_backup(public_folder, backup_folder)
-    clean_up_static_folder(public_folder)
-    contents = get_path_tree(public_folder)
-    print_tree(contents)
-
-
-if __name__ == "__main__":
-    main()
+    clean_up_folder(public_folder)
+    make_copy(static_folder, public_folder)
+    src_contents = get_path_tree(static_folder)
+    print(f'Static Folder:{print_tree(src_contents)}')
+    dst_contents = get_path_tree(public_folder)
+    print(f'Public Folder:{print_tree(dst_contents)}')
