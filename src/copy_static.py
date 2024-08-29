@@ -18,7 +18,7 @@ def clean_up_folder(address):
                 print(f'[!] Could not delete folder (not empty): {dir_path}. Error: {e}')
 
 
-    print (f'[!] Deleted all files and empty folders in the folder {address}')
+    print (f'[!] Deleted all files and empty folders in the folder {address}\n')
 
 
 def make_copy(address, destination):
@@ -39,7 +39,7 @@ def make_copy(address, destination):
             dst_file = os.path.join(backup_path, file)
             copy_file(src_file, dst_file)
     
-    print (f'[i] Copied folder and content to: {destination}')
+    print (f'[i] Copied folder and content to: {destination}\n')
 
 def copy_file(src, dst):
     try:
@@ -95,6 +95,7 @@ def print_tree(contents):
     if contents:
         root_address = contents[0][0]
         _print_tree(root_address, '')
+    print('\n')
         
 
 def copy_static_to_public():
@@ -102,9 +103,9 @@ def copy_static_to_public():
     static_folder = "./static"
     backup_folder = './backups'
 
+    print ('Cleaning up...\n')
     clean_up_folder(public_folder)
-    make_copy(static_folder, public_folder)
-    src_contents = get_path_tree(static_folder)
-    print(f'Static Folder:{print_tree(src_contents)}')
     dst_contents = get_path_tree(public_folder)
-    print(f'Public Folder:{print_tree(dst_contents)}')
+    
+    print ('Copying ./static to ./public\n')
+    make_copy(static_folder, public_folder)
