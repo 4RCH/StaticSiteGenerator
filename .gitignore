@@ -1,0 +1,5 @@
+__pycache__/
+public/
+public/test_folder/
+static/backups/
+static/backups/test_folder/
