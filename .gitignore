@@ -3,3 +3,7 @@ public/
 public/test_folder/
 static/backups/
 static/backups/test_folder/
+.gitignore:Zone.Identifier
+main - Copy.sh:Zone.Identifier
+test.sh
+main.sh
