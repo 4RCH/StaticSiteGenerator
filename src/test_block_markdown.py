@@ -1,7 +1,7 @@
 import unittest
 import data_constants as tt
 from block_markdown import markdown_to_blocks, block_to_blocktype, markdown_to_html_node
-from htmlnode import HTMLNode, ParentNode
+from htmlnode import HTMLNode, ParentNode, LeafNode
 
 block_types = [
             tt.markdown_paragraph,
@@ -24,6 +24,7 @@ blocks = [
     '* This is the first list item in a list block\n* This is a list item\n* This is another list item',
     '###### This is a Header for the list',
     '1. This is another list item in a list block\n2. This is a list item\n3. This is another list item',
+    "```\ndef code_blocks:\n    if code_block:\n        symbols = []\n    print(f'This is a string: {symbols}')\n```",
     ]
 
 class TestBlockMarkdown(unittest.TestCase):
@@ -69,6 +70,12 @@ class TestBlockMarkdown(unittest.TestCase):
 
     def test_single_line_markdown(self):
         self.assertEqual(markdown_to_blocks("# Single line heading"), ["# Single line heading"])
+
+    def test_markdown_to_html_code_block(self):
+        code_block = "```\ndef code_blocks:\n    if code_block:\n        symbols = []\n    print(f'This is a string: {symbols}')\n```"
+        result = markdown_to_html_node(code_block)
+        result_str = result.to_html()
+        self.assertTrue('<code>' in result_str and '<pre>' in result_str)
 
 if __name__ == "__main__":
     unittest.main()

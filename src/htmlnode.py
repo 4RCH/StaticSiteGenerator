@@ -1,13 +1,3 @@
-link_tag = "a"
-bold_tag = "b"
-italic_tag = "i"
-quote_tag = "q"
-code_tag = "code"
-href_tag = "href"
-paragraph_tag = "p"
-header1_tag = "hl"
-normal_tag = None
-
 class HTMLNode():
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
@@ -48,7 +38,9 @@ class LeafNode(HTMLNode):
         if self.tag == None:
             return f'{self.value}'
         if self.tag == "a":
-                return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
+            return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
+        if self.tag =="img":
+            return f'<{self.tag}>({self.value})</{self.tag}>'
         return f'<{self.tag}>{self.value}</{self.tag}>'
 
     def __repr__(self):

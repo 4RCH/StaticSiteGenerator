@@ -5,7 +5,8 @@ text_type_code = "code"
 text_type_link = "link"
 text_type_image = "image"
 
-delimiter_code = "`"
+delimiter_inline_code = "`"
+delimiter_code = "```"
 delimiter_bold = "**"
 delimiter_italics = "*"
 delimiter_links = "["
@@ -14,9 +15,13 @@ delimiter_quotes = ">"
 
 tag_paragraph = ""
 tag_heading = "#"
-tag_code = "`"
-tag_quote = ">"
+tag_code = "code"
+tag_quote = "q"
 tag_list = "*"
+tag_bold = 'b'
+tag_italic ='i'
+tag_image = 'img'
+tag_link = 'a'
 
 markdown_paragraph = "paragraph"
 markdown_heading = "heading"

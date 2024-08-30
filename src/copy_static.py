@@ -1,22 +1,44 @@
 import os
 
-def clean_up_folder(address):
-    for root, dirs, files in os.walk(address, topdown=False):
-        for file in files:
-            file_path = os.path.join(root, file)
-            try:
-                os.remove(file_path)
-                print(f'[i] Deleted file: {file_path}')
-            except Exception as e:
-                print(f'[!] Could not delete file: {file_path}. Error: {e}')
-        for dir in dirs:
-            dir_path = os.path.join(root, dir)
-            try:
-                os.rmdir(dir_path)
-                print (f'[i] Deleted folder: {dir_path}')
-            except OSError as e:
-                print(f'[!] Could not delete folder (not empty): {dir_path}. Error: {e}')
 
+def copy_static_to_public():
+    public_folder = "./public"
+    static_folder = "./static"
+
+    print ('Cleaning up...\n')
+    clean_up_folder(public_folder)
+    
+    print ('Copying ./static to ./public\n')
+    make_copy(static_folder, public_folder)
+
+def clean_up_folder(address):
+    if os.path.isfile(address):
+        try:
+            os.remove(address)
+            print(f'Deleted file {address}')
+        except Exception as e:
+            print(f'[!] Could not delete file: {address}. Error: {e}')
+    else:
+        for root, dirs, files in os.walk(address, topdown=False):
+            for file in files:
+                file_path = os.path.join(root, file)
+                try:
+                    os.remove(file_path)
+                    print(f'[i] Deleted file: {file_path}')
+                except Exception as e:
+                    print(f'[!] Could not delete file: {file_path}. Error: {e}')
+            for dir in dirs:
+                dir_path = os.path.join(root, dir)
+                try:
+                    os.rmdir(dir_path)
+                    print (f'[i] Deleted folder: {dir_path}')
+                except OSError as e:
+                    print(f'[!] Could not delete folder (not empty): {dir_path}. Error: {e}')
+        try:
+            os.rmdir(address)
+            print(f'[i] Deleted folder: {address}')
+        except OSError as e:
+            print(f'[!] Could not delete folder: {address}. Error: {e}')
 
     print (f'[!] Deleted all files and empty folders in the folder {address}\n')
 
@@ -97,15 +119,3 @@ def print_tree(contents):
         _print_tree(root_address, '')
     print('\n')
         
-
-def copy_static_to_public():
-    public_folder = "./public"
-    static_folder = "./static"
-    backup_folder = './backups'
-
-    print ('Cleaning up...\n')
-    clean_up_folder(public_folder)
-    dst_contents = get_path_tree(public_folder)
-    
-    print ('Copying ./static to ./public\n')
-    make_copy(static_folder, public_folder)

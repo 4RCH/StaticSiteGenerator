@@ -21,7 +21,7 @@ class TestMarkdown(unittest.TestCase):
 
     def test_code(self):
         node3 = TextNode("New is text with `code` tags.", tt.text_type_text)
-        splitnode = split_nodes_delimiter([node3], tt.delimiter_code, tt.text_type_code)
+        splitnode = split_nodes_delimiter([node3], tt.delimiter_inline_code, tt.text_type_code)
         self.assertEqual(str(splitnode), "[Textnode New is text with , text, None, Textnode code, code, None, Textnode  tags., text, None]")
 
     def test_missing_markdown(self):

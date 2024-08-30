@@ -1,15 +1,15 @@
 import re
 import data_constants as tt
-from htmlnode import HTMLNode, ParentNode, LeafNode
+from htmlnode import ParentNode, LeafNode
 from textnode import text_node_to_html_node
 from inline_markdown import text_to_textnode
 
 # Break text into blocks
 def markdown_to_blocks(markdown):
-    pattern = r"\n\s+"
+    pattern = r"(\n\s*\n|```.*?```)"
     blocks = []
 
-    lines = re.split(pattern, markdown)
+    lines = re.split(pattern, markdown, flags=re.DOTALL)
     blocks = [line for line in lines if line.strip()]
     return blocks
 
@@ -28,12 +28,12 @@ def block_to_blocktype(markdown_block):
                 return (tt.markdown_heading, i)
     
     # Check for Code type
-    if markdown_block.startswith("```") and markdown_block.endswith("```"):
+    if len(lines) > 1 and lines[0].startswith(tt.delimiter_code) and lines[-1].startswith(tt.delimiter_code):
         return tt.markdown_code
     
     # Check for Quote type
-    if markdown_block.startswith(tt.tag_quote + ' '):
-        if all(line.startswith(f'{tt.tag_quote} ') for line in lines):
+    if markdown_block.startswith('> '):
+        if all(line.startswith('>') for line in lines):
             return tt.markdown_quote
     
     # Check for unordered list type
@@ -55,10 +55,10 @@ def markdown_to_html_node(markdown):
     blocks_def = []
     for block in blocks:
         blocks_def.append((block, block_to_blocktype(block)))    
-    children = block_formatter(blocks_def)
+    children = block_to_html_node(blocks_def)
     return ParentNode('div', children, None)
 
-def block_formatter(block_def):
+def block_to_html_node(block_def):
     nodes_list = []
 
     block_type_to_function = {
@@ -80,6 +80,29 @@ def block_formatter(block_def):
 
     return nodes_list
 
+def strip_markdown(text):
+    ## Remove headers
+    text = re.sub(r'^\s*#{1,6}\s+', '', text, flags=re.MULTILINE)
+    # Remove bold and italic
+    text = re.sub(r'(\*\*|__)(.*?)\1', r'\2', text)
+    text = re.sub(r'(\*|_)(.*?)\1', r'\2', text)
+    # Remove inline code
+    text = re.sub(r'`([^`]*)`', r'\1', text)
+    # Remove code blocks
+    text = re.sub(r'```[\s\S]*?```', '', text)
+    # Remove blockquotes
+    text = re.sub(r'^\s*>+\s?', '', text, flags=re.MULTILINE)
+    # Remove unordered list markers
+    text = re.sub(r'^\s*[-*+]\s+', '', text, flags=re.MULTILINE)
+    # Remove ordered list markers
+    text = re.sub(r'^\s*\d+\.\s+', '', text, flags=re.MULTILINE)
+    # Remove links
+    text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
+    # Remove images
+    text = re.sub(r'!\[([^\]]*)\]\([^\)]+\)', r'\1', text)
+    return text
+
+
 def text_to_children(text):
     children = []
     text_nodes = text_to_textnode(text)
@@ -88,40 +111,40 @@ def text_to_children(text):
         children.append(html_node)
     return children
 
-def text_to_paragraph(raw_text):
-    children = text_to_children(raw_text)
+def text_to_paragraph(block):
+    children = text_to_children(block)
     return ParentNode('p', children)
 
-def text_to_header(header_data):
-    children = text_to_children(header_data[0])
-    return ParentNode(f'h{header_data[1][1]}', children)
+def text_to_header(block_and_header):
+    children = text_to_children(block_and_header[0])
+    return ParentNode(f'h{block_and_header[1][1]}', children)
 
-def text_to_code(raw_text):
-    children = text_to_children(raw_text)
-    code = ParentNode('code', children)
-    return ParentNode('pre', [code])
+def text_to_code(code_block):
+    removed_delimiter = code_block.strip(tt.delimiter_code).strip()
+    children = text_to_children(removed_delimiter)
+    return ParentNode('pre', [ParentNode('code', children)])
 
-def text_to_quote(raw_text):
-    chunks = split_text_into_chunks(raw_text, '\n')
+def text_to_quote(quote_block):
+    chunks = split_text_into_chunks(quote_block, '\n')
     if not chunks or all(chunk.strip() == "" for chunk in chunks):
         raise ValueError('[!] Invalid input: empty or whitespace-only quote block')
     children = []
     for chunk in chunks:
         if chunk.strip():
-            children = text_to_children(chunk)
+            children.extend(text_to_children(chunk))
     return ParentNode('blockquote', children)
 
-def text_to_un_list(raw_text):
+def text_to_un_list(un_list_block):
     unord_list =[]
-    chunks = split_text_into_chunks(raw_text, '\n')
+    chunks = split_text_into_chunks(un_list_block, '\n')
     for chunk in chunks:
         children = text_to_children(chunk)
         unord_list.append(ParentNode('li', children))
     return ParentNode('ul', unord_list)
 
-def text_to_ord_list(raw_text):
+def text_to_ord_list(ord_list_block):
     ord_list = []
-    chunks = raw_text.split('\n')
+    chunks = ord_list_block.split('\n')
     for chunk in chunks:
         children = text_to_children(chunk)
         ord_list.append(ParentNode('li', children))
@@ -129,15 +152,3 @@ def text_to_ord_list(raw_text):
 
 def split_text_into_chunks(text, delimiter):
     return text.split(delimiter)
-
-'''
-def main():
-    with open("./src/markdown.md", "r", encoding="UTF-8") as block_list:
-            markdown_content = block_list.read()
-    final_object = markdown_to_html_node(markdown_content)
-    print(final_object)
-
-if __name__ == "__main__":
-    main()
-
-'''
