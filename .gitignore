@@ -1,5 +1,5 @@
 __pycache__/
-public/
-static/
-backups/
-tests/
+public/**
+static/**
+backups/**
+tests/**
