@@ -1,5 +1,5 @@
 from block_markdown import markdown_to_blocks, markdown_to_html_node
-from copy_static import clean_up_folder, get_path_tree, print_tree, make_copy
+from copy_static import clean_up_folder, get_path_tree, print_tree
 import os
 
 def open_file(file_path):
@@ -11,7 +11,7 @@ def write_file(file_path, content):
     if os.path.isfile(file_path):
         print(f'[i] File {os.path.basename(file_path)} already exists, cleaning up..')
         clean_up_folder(file_path)
-    with open(file_path, 'x') as file:
+    with open(file_path, 'w') as file:
         file.write(content)
     print (f'[i] File created: {file}')
 
@@ -56,24 +56,27 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             print(f'    using template "{template_path}"\n')
     except Exception as e:
         print(f'[!] template {template_file} is missing')
+        return
     
     folder_structure = get_path_tree(dir_path_content)
     print("[i] The source structure looks like this:\n")
     print_tree(folder_structure)
     
-    for file in folder_structure:
-        if os.path.isfile(file):
-            file = os.path.splitext(file)
-            if file[1] == 'md':
-                html_node = markdown_to_html_node(file)
+    for address, folders, files in folder_structure:
+        for file in files:
+            if file.endswith('.md'):
+                file_path = os.path.join(address, file)
+                html_node = markdown_to_html_node(open_file(file_path))
                 html_content = html_node.to_html()
-                print(f'[i] Generated HTML content:\n{html_content}\n') # Can be safely deleted after tests
-                page_title = extract_title(file)
+                print(f'[i] Generated HTML content:\n{html_content}\n')
+                page_title = extract_title(open_file(file_path))
                 page_content = template_file.replace('{{ Title }}', page_title).replace('{{ Content }}', html_content)
-                write_file(dest_dir_path,page_content)
+                dest_file_path = os.path.join(dest_dir_path, os.path.relpath(file_path, dir_path_content)).replace('md', 'html')
+                dest_folder = os.path.dirname(dest_file_path)
+                os.makedirs(dest_folder, exist_ok= True)
+                write_file(dest_file_path, page_content)
             else:
                 print(f'{file} might not be a markdown file')
-
     return True
 
 def main():

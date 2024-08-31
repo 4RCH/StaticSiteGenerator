@@ -1,3 +1,5 @@
+import data_constants as tt
+
 class HTMLNode():
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
@@ -37,10 +39,10 @@ class LeafNode(HTMLNode):
             raise ValueError("[!] Invalid HTML: missing value")
         if self.tag == None:
             return f'{self.value}'
-        if self.tag == "a":
+        if self.tag == tt.tag_link:
             return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
-        if self.tag =="img":
-            return f'<{self.tag}>({self.value})</{self.tag}>'
+        if self.tag ==tt.tag_image:
+            return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
         return f'<{self.tag}>{self.value}</{self.tag}>'
 
     def __repr__(self):

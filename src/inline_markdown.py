@@ -58,7 +58,6 @@ def split_nodes_generic(nodes, pattern, text_type):
                 split_nodes.append(TextNode(node.text[last_index:start_index], tt.text_type_text))
             split_nodes.append(TextNode(match.group(1), text_type, match.group(2)))
             last_index = match.end()
-        #add remaining text after the last image
         if last_index < len(node.text):
             split_nodes.append(TextNode(node.text[last_index:], tt.text_type_text))
         new_nodes.extend(split_nodes)

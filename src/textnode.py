@@ -31,5 +31,5 @@ def text_node_to_html_node(text_node):
     if text_node.text_type == tt.text_type_link:
         return LeafNode(tt.tag_link, text_node.text, {"href":text_node.url})
     if text_node.text_type == tt.text_type_image:
-        return LeafNode(tt.tag_image, None, {"src":text_node.url ,"alt":text_node.text})
+        return LeafNode(tt.tag_image, text_node.text, {"src":text_node.url ,"alt":text_node.text})
     raise Exception(f'[!] Text type: {text_node.text_type} is not a supported type')

@@ -45,7 +45,7 @@ def clean_up_folder(address):
 
 def make_copy(address, destination):
     if not os.path.exists(destination):
-        os.makedirs(destination)
+        os.makedirs(destination, exist_ok= True)
 
     contents = get_path_tree(address)
     for addr, folders, files in contents:
@@ -53,7 +53,7 @@ def make_copy(address, destination):
         relative_path = os.path.relpath(addr, start=address)
         backup_path = os.path.join(destination, relative_path)
         if not os.path.exists(backup_path):
-            os.makedirs(backup_path)
+            os.makedirs(backup_path, exist_ok= True)
 
         # Copy files to the backup directory
         for file in files:
@@ -117,5 +117,4 @@ def print_tree(contents):
     if contents:
         root_address = contents[0][0]
         _print_tree(root_address, '')
-    print('\n')
         

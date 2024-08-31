@@ -17,12 +17,10 @@ class TestPageConjurer(unittest.TestCase):
         des_path = './tests/result/MarkdownSimple.md'
         template_path = 'template.html'
 
-
         page = (generate_page(src_path, template_path, des_path))
 
         # check the page generation was successful
         self.assertTrue(page)
-
         with open(des_path, "r", encoding="UTF-8") as file:
             content = file.read()
 
@@ -30,7 +28,6 @@ class TestPageConjurer(unittest.TestCase):
             self.assertIn('<html>', content)
             self.assertIn('<title>', content)
             self.assertIn('<div>', content)
-
 
     def test_page_generation(self):
         src_path = './tests/markdown.md'
